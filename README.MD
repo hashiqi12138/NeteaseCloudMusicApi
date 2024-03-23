@@ -24,7 +24,7 @@
 
 ## 环境要求
 
-需要 NodeJS 14+ 环境
+需要 NodeJS 8.12+ 环境
 
 ## 安装
 
@@ -74,22 +74,6 @@ v4.0.8 加入了 Vercel 配置文件,可以直接在 Vercel 下部署了,不需�
 5. 直接点`Continue`
 6. `PROJECT NAME`自己填,`FRAMEWORK PRESET` 选 `Other` 然后直接点 `Deploy` 接着等部署完成即可  
 
-## 腾讯云 serverless 部署
-因 `Vercel` 在国内访问太慢,在此提供腾讯云 serverless 部署方法(注意:腾讯云 serverless 并不是免费的,前三个月有免费额度,之后收费)
-### 操作方法
-1. fork 此项目
-2. 在腾讯云serverless应用管理页面( https://console.cloud.tencent.com/sls ),点击`新建应用`
-3. 顶部`创建方式`选择 `Web 应用`
-4. 选择 `Express框架`,点击底部`下一步按钮`
-5. 输入`应用名`,上传方式选择`代码仓库`,进行GitHub授权(如已授权可跳过这一步),代码仓库选择刚刚fork的项目
-6. 启动文件填入:
-```
-#!/bin/bash
-export PORT=9000
-/var/lang/node16/bin/node app.js
-``` 
-7. 点击`完成`,等待部署完成,点击`资源列表`的 `API网关` 里的 `URL`,正常情况会打开文档地址,点击文档`例子`可查看接口调用效果
-
 ## 可以在Node.js调用
 
 v3.31.0后支持Node.js调用,导入的方法为`module`内的文件名,返回内容包含`status`和`body`,`status`为状态码,`body`为请求返回内容,参考`module_example` 文件夹下的 `test.js`
@@ -128,8 +112,9 @@ banner({ type:0 }).then(res=>{
 
 ## 使用文档
 
-[文档地址](http://docs.neteasecloudmusicapi.binaryify.com/#/) 
+[文档地址](https://binaryify.github.io/NeteaseCloudMusicApi) 
 
+[文档地址2](https://neteasecloudmusicapi.vercel.app)
 
 ![文档](https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/static/docs.png)
 
@@ -377,35 +362,6 @@ banner({ type:0 }).then(res=>{
 239. 音乐人任务(新)
 240. 内部版本接口
 241. 歌单更新播放量
-242. 黑胶时光机
-243. 音乐百科 - 简要信息
-244. 乐谱列表
-245. 乐谱内容
-246. 曲风列表
-247. 曲风偏好
-248. 曲风详情
-249. 曲风-歌曲
-250. 曲风-专辑
-251. 曲风-歌单
-252. 曲风-歌手
-253. 私信和通知接口
-254. 回忆坐标
-255. 播客搜索
-256. 播客声音上传
-257. 验证接口-二维码生成
-258. 验证接口-二维码检测
-259. 听歌识曲
-260. 根据nickname获取userid接口
-261. 播客声音列表
-262. 专辑简要百科信息
-263. 歌曲简要百科信息
-264. 歌手简要百科信息
-265. mv简要百科信息
-266. 搜索歌手
-267. 用户贡献内容
-268. 用户贡献条目、积分、云贝数量
-269. 年度听歌报告
-270. 播客声音搜索
 
 ## 更新日志
 
