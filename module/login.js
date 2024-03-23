@@ -4,7 +4,7 @@ const crypto = require('crypto')
 
 module.exports = async (query, request) => {
   query.cookie.os = 'ios'
-  query.cookie.appver = '8.10.90'
+  query.cookie.appver = '8.7.01'
   const data = {
     username: query.email,
     password:
@@ -33,12 +33,7 @@ module.exports = async (query, request) => {
     result = {
       status: 200,
       body: {
-        ...JSON.parse(
-          JSON.stringify(result.body).replace(
-            /avatarImgId_str/g,
-            'avatarImgIdStr',
-          ),
-        ),
+        ...result.body,
         cookie: result.cookie.join(';'),
       },
       cookie: result.cookie,

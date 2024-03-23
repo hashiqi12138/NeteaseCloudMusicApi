@@ -4,9 +4,7 @@ module.exports = (query, request) => {
   return request(
     'POST',
     `https://music.163.com/weapi/music-vip-membership/front/vip/info`,
-    {
-      userId: query.uid || '',
-    },
+    {},
     {
       crypto: 'weapi',
       cookie: query.cookie,
