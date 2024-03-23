@@ -5,8 +5,14 @@ const { PacProxyAgent } = require('pac-proxy-agent')
 const http = require('http')
 const https = require('https')
 const tunnel = require('tunnel')
+const fs = require('fs')
+const path = require('path')
+const tmpPath = require('os').tmpdir()
+const anonymous_token = fs.readFileSync(
+  path.resolve(tmpPath, './anonymous_token'),
+  'utf-8',
+)
 const { URLSearchParams, URL } = require('url')
-const config = require('../util/config.json')
 // request.debug = true // 开启可看到更详细信息
 
 const chooseUserAgent = (ua = false) => {
@@ -46,6 +52,11 @@ const chooseUserAgent = (ua = false) => {
 const createRequest = (method, url, data = {}, options) => {
   return new Promise((resolve, reject) => {
     let headers = { 'User-Agent': chooseUserAgent(options.ua) }
+    options.headers = options.headers || {}
+    headers = {
+      ...headers,
+      ...options.headers,
+    }
     if (method.toUpperCase() === 'POST')
       headers['Content-Type'] = 'application/x-www-form-urlencoded'
     if (url.includes('music.163.com'))
@@ -64,10 +75,15 @@ const createRequest = (method, url, data = {}, options) => {
         // NMTID: crypto.randomBytes(16).toString('hex'),
         _ntes_nuid: crypto.randomBytes(16).toString('hex'),
       }
+      if (url.indexOf('login') === -1) {
+        options.cookie['NMTID'] = crypto.randomBytes(16).toString('hex')
+      }
       if (!options.cookie.MUSIC_U) {
         // 游客
         if (!options.cookie.MUSIC_A) {
-          options.cookie.MUSIC_A = config.anonymous_token
+          options.cookie.MUSIC_A = anonymous_token
+          options.cookie.os = options.cookie.os || 'ios'
+          options.cookie.appver = options.cookie.appver || '8.10.90'
         }
       }
       headers['Cookie'] = Object.keys(options.cookie)
@@ -85,6 +101,8 @@ const createRequest = (method, url, data = {}, options) => {
     }
     // console.log(options.cookie, headers['Cookie'])
     if (options.crypto === 'weapi') {
+      headers['User-Agent'] =
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.69'
       let csrfToken = (headers['Cookie'] || '').match(/_csrf=([^(;|$)]+)/)
       data.csrf_token = csrfToken ? csrfToken[1] : ''
       data = encrypt.weapi(data)
@@ -183,9 +201,12 @@ const createRequest = (method, url, data = {}, options) => {
         )
         try {
           if (options.crypto === 'eapi') {
-            answer.body = JSON.parse(encrypt.decrypt(body).toString())
+            answer.body = JSON.parse(encrypt.decrypt(body))
           } else {
             answer.body = body
+          }
+          if (answer.body.code) {
+            answer.body.code = Number(answer.body.code)
           }
 
           answer.status = Number(answer.body.code || res.status)

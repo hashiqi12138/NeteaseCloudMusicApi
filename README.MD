@@ -128,9 +128,8 @@ banner({ type:0 }).then(res=>{
 
 ## 使用文档
 
-[文档地址](https://binaryify.github.io/NeteaseCloudMusicApi) 
+[文档地址](http://docs.neteasecloudmusicapi.binaryify.com/#/) 
 
-[文档地址2](https://neteasecloudmusicapi.vercel.app)
 
 ![文档](https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/static/docs.png)
 
@@ -389,6 +388,24 @@ banner({ type:0 }).then(res=>{
 250. 曲风-专辑
 251. 曲风-歌单
 252. 曲风-歌手
+253. 私信和通知接口
+254. 回忆坐标
+255. 播客搜索
+256. 播客声音上传
+257. 验证接口-二维码生成
+258. 验证接口-二维码检测
+259. 听歌识曲
+260. 根据nickname获取userid接口
+261. 播客声音列表
+262. 专辑简要百科信息
+263. 歌曲简要百科信息
+264. 歌手简要百科信息
+265. mv简要百科信息
+266. 搜索歌手
+267. 用户贡献内容
+268. 用户贡献条目、积分、云贝数量
+269. 年度听歌报告
+270. 播客声音搜索
 
 ## 更新日志
 
