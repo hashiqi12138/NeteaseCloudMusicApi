@@ -244,13 +244,6 @@ export function artists(
   params: { id: string | number } & RequestBaseConfig,
 ): Promise<Response>
 
-export function audio_match(
-  params: {
-    duration: string | number
-    audioFP: string | number
-  } & RequestBaseConfig,
-): Promise<Response>
-
 export function avatar_upload(
   params: ImageUploadConfig & RequestBaseConfig,
 ): Promise<Response>
@@ -1085,7 +1078,7 @@ type SongDetail = {
   m: SongDetailQuality | null
   l: SongDetailQuality | null
   sq: SongDetailQuality | null
-  hr: SongDetailQuality | null
+  hr: unknown
   a: unknown | null
   cd: string
   no: number
@@ -1156,9 +1149,6 @@ export const enum SoundQualityType {
   exhigh = 'exhigh',
   lossless = 'lossless',
   hires = 'hires',
-  jyeffect = 'jyeffect',
-  jymaster = 'jymaster',
-  sky = 'sky',
 }
 
 export function song_url_v1(
@@ -1624,17 +1614,7 @@ export function musician_cloudbean_obtain(
   } & RequestBaseConfig,
 ): Promise<Response>
 
-export function vip_info(
-  params: {
-    uid?: number | string
-  } & RequestBaseConfig,
-): Promise<Response>
-
-export function vip_info_v2(
-  params: {
-    uid?: number | string
-  } & RequestBaseConfig,
-): Promise<Response>
+export function vip_info(params: RequestBaseConfig): Promise<Response>
 
 export function musician_sign(params: RequestBaseConfig): Promise<Response>
 
@@ -1792,21 +1772,3 @@ export function style_artist(
 ): Promise<Response>
 
 export function pl_count(params: RequestBaseConfig): Promise<Response>
-
-export function get_userids(
-  params: {
-    nicknames: string
-  } & RequestBaseConfig,
-): Promise<Response>
-
-export function voicelist_list_search(
-  params: {
-    limit?: string | number
-    offset?: string | number
-    name?: string
-    displayStatus?: string
-    type?: string
-    voiceFeeType?: string | number
-    radioId?: string
-  } & RequestBaseConfig,
-): Promise<Response>
