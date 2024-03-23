@@ -1,7 +1,6 @@
 const encrypt = require('./crypto')
-const crypto = require('crypto')
-const { default: axios } = require('axios')
-const { PacProxyAgent } = require('pac-proxy-agent')
+const axios = require('axios')
+const PacProxyAgent = require('pac-proxy-agent')
 const http = require('http')
 const https = require('https')
 const tunnel = require('tunnel')
@@ -58,12 +57,6 @@ const createRequest = (method, url, data = {}, options) => {
     }
     // headers['X-Real-IP'] = '118.88.88.88'
     if (typeof options.cookie === 'object') {
-      options.cookie = {
-        ...options.cookie,
-        __remember_me: true,
-        NMTID: crypto.randomBytes(16).toString('hex'),
-        _ntes_nuid: crypto.randomBytes(16).toString('hex'),
-      }
       if (!options.cookie.MUSIC_U) {
         // 游客
         if (!options.cookie.MUSIC_A) {
@@ -80,8 +73,6 @@ const createRequest = (method, url, data = {}, options) => {
         .join('; ')
     } else if (options.cookie) {
       headers['Cookie'] = options.cookie
-    } else {
-      headers['Cookie'] = '__remember_me=true; NMTID=xxx'
     }
     // console.log(options.cookie, headers['Cookie'])
     if (options.crypto === 'weapi') {
@@ -104,7 +95,7 @@ const createRequest = (method, url, data = {}, options) => {
       const header = {
         osver: cookie.osver, //系统版本
         deviceId: cookie.deviceId, //encrypt.base64.encode(imei + '\t02:00:00:00:00:00\t5106025eb79a5247\t70ffbaac7')
-        appver: cookie.appver || '8.9.70', // app版本
+        appver: cookie.appver || '8.7.01', // app版本
         versioncode: cookie.versioncode || '140', //版本号
         mobilename: cookie.mobilename, //设备model
         buildver: cookie.buildver || Date.now().toString().substr(0, 10),

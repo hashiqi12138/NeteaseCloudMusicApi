@@ -258,17 +258,6 @@
 240. 内部版本接口
 241. 歌单更新播放量
 242. 黑胶时光机
-243. 音乐百科 - 简要信息
-244. 乐谱列表
-245. 乐谱内容
-246. 曲风列表
-247. 曲风偏好
-248. 曲风详情
-249. 曲风-歌曲
-250. 曲风-专辑
-251. 曲风-歌单
-252. 曲风-歌手
-253. 私信和通知接口
 
 ## 安装
 
@@ -326,8 +315,6 @@ npx NeteaseCloudMusicApi@latest
 
 v4.0.8 加入了 Vercel 配置文件,可以直接在 Vercel 下部署了,不需要自己的服务器(访问 Vercel 部署的接口,需要额外加一个 realIP 参数,如 `/song/url?id=191254&realIP=116.25.146.177`)
 
-不能正常访问的,绑定下国内备案过的域名,之后即可正常访问
-
 ### 操作方法
 
 1. fork 此项目
@@ -336,23 +323,6 @@ v4.0.8 加入了 Vercel 配置文件,可以直接在 Vercel 下部署了,不需�
 4. 点击 `PERSONAL ACCOUNT` 的 `select`
 5. 直接点`Continue`
 6. `PROJECT NAME`自己填,`FRAMEWORK PRESET` 选 `Other` 然后直接点 `Deploy` 接着等部署完成即可
-
-
-## 腾讯云 serverless 部署
-因 `Vercel` 在国内访问太慢(不绑定自己的域名的情况下),在此提供腾讯云 serverless 部署方法(注意:腾讯云 serverless 并不是免费的,前三个月有免费额度,之后收费)
-### 操作方法
-1. fork 此项目
-2. 在腾讯云serverless应用管理页面( https://console.cloud.tencent.com/sls ),点击`新建应用`
-3. 顶部`创建方式`选择 `Web 应用`
-4. 选择 `Express框架`,点击底部`下一步按钮`
-5. 输入`应用名`,上传方式选择`代码仓库`,进行GitHub授权(如已授权可跳过这一步),代码仓库选择刚刚fork的项目
-6. 启动文件填入:
-```
-#!/bin/bash
-export PORT=9000
-/var/lang/node16/bin/node app.js
-``` 
-7. 点击`完成`,等待部署完成,点击`资源列表`的 `API网关` 里的 `URL`,正常情况会打开文档地址,点击文档`例子`可查看接口调用效果
 
 ## 可以使用代理
 
@@ -481,8 +451,6 @@ $ sudo docker run -d -p 3000:3000 netease-music-api
 
 !> 分页接口返回字段里有`more`,more 为 true 则为有下一页
 
-!> 如果不需要接口headers携带cookies信息,可以加上noCookie参数,如`?noCookie=true`
-
 ### 登录
 
 说明 : 登录有三个接口,建议使用`encodeURIComponent`对密码编码或者使用`POST`请求,避免某些特殊字符无法解析,如`#`(`#`在 url 中会被识别为 hash,而不是 query)
@@ -491,7 +459,7 @@ $ sudo docker run -d -p 3000:3000 netease-music-api
 
 因网易增加了网易云盾验证,密码登录暂时不要使用,尽量使用短信验证码登录和二维码登录,否则调用某些接口会触发需要验证的错误
 
-#### 1. 手机登录(现在要求验证,暂时绕不过,请使用二维码登录)
+#### 1. 手机登录
 
 **必选参数 :**  
 `phone`: 手机号码
@@ -509,7 +477,7 @@ $ sudo docker run -d -p 3000:3000 netease-music-api
 
 **调用例子 :** `/login/cellphone?phone=xxx&password=yyy` `/login/cellphone?phone=xxx&md5_password=yyy` `/login/cellphone?phone=xxx&captcha=1234`
 
-#### 2. 邮箱登录(现在要求验证,暂时绕不过,请使用二维码登录)
+#### 2. 邮箱登录
 
 **必选参数 :**
 
@@ -561,7 +529,7 @@ v3.30.0 后支持手动传入 cookie,登录接口返回内容新增 `cookie` 字
 
 ##### 3. 二维码检测扫码状态接口
 
-说明: 轮询此接口可获取二维码扫码状态,800 为二维码过期,801 为等待扫码,802 为待确认,803 为授权登录成功(803 状态码下会返回 cookies),如扫码后返回502,则需加上noCookie参数,如`&noCookie=true`
+说明: 轮询此接口可获取二维码扫码状态,800 为二维码过期,801 为等待扫码,802 为待确认,803 为授权登录成功(803 状态码下会返回 cookies)
 
 必选参数: `key`,由第一个接口生成
 
@@ -804,14 +772,6 @@ signature：用户签名
 **接口地址 :** `/avatar/upload`
 
 **调用例子 :** `/avatar/upload?imgSize=200`
-
-### 私信和通知接口
-
-说明 : 登录后调用此接口,可获取私信和通知数量信息
-
-**接口地址 :** `/pl/count`
-
-**调用例子 :** `/pl/count`
 
 ### 国家编码列表
 
@@ -1407,13 +1367,13 @@ tags: 歌单标签
 
 **调用例子 :** `/playlist/track/all?id=24381616&limit=10&offset=1`
 
-> 注：关于`offset`，你可以这样理解，假设你当前的歌单有200首歌
+> 注：关于`offset`，你可以这样理解，假设你当前的歌单有100首歌
 > 
-> 你传入limit=50&offset=0等价于limit=50，你会得到第1-50首歌曲
-
-> 你传入limit=50&offset=50，你会得到第51-100首歌曲
-
-> 如果你设置limit=50&offset=100，你就会得到第101-150首歌曲
+> 你传入limit=10&offset=0等价于limit=10，你会得到第1-10首歌曲
+> 
+> 你传入limit=10&offset=1，你会得到第2-11首歌曲
+> 
+> 如果你设置limit=10&offset=2，你就会得到第3-12首歌曲
 
 
 ### 歌单详情动态
@@ -1453,19 +1413,6 @@ tags: 歌单标签
 **接口地址 :** `/song/url`
 
 **调用例子 :** `/song/url?id=33894312` `/song/url?id=405998841,33894312`
-
-### 获取音乐 url - 新版
-
-说明 : 使用注意事项同上
-
-**必选参数 :** `id` : 音乐 id
- `level`: 播放音质等级, 分为 `standard` => `标准`,`higher` => `较高`, `exhigh`=>`极高`, 
-`lossless`=>`无损`, `hires`=>`Hi-Res`, `jyeffect` => `高清环绕声`, `sky` => `沉浸环绕声`,
-`jymaster` => `超清母带`
-
-**接口地址 :** `/song/url/v1`
-
-**调用例子 :** `/song/url/v1?id=33894312&level=exhigh` `/song/url/v1?id=405998841,33894312&level=lossless`
 
 ### 音乐是否可用
 
@@ -1657,50 +1604,6 @@ tags: 歌单标签
 返回数据如下图 :
 ![获取歌词](https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/static/%E6%AD%8C%E8%AF%8D.png)
 
-### 获取逐字歌词
-
-说明 : 此接口的 `yrc` 字段即为逐字歌词 (可能有歌曲不包含逐字歌词)
-
-
-**必选参数 :** `id`: 音乐 id
-
-**接口地址 :** `/lyric/new`
-
-**调用例子 :** `/lyric/new?id=1824020871`
-
-
-相关讨论可见: [Issue](https://github.com/Binaryify/NeteaseCloudMusicApi/issues/1667)
-
-**歌词格式解析 :**
-
-当逐字歌词适用时，`yrc`的`lyric`字段包括形式如下的内容
-* （可能存在）JSON 歌曲元数据
-```
-{"t":0,"c":[{"tx":"作曲: "},{"tx":"柳重言","li":"http://p1.music.126.net/Icj0IcaOjH2ZZpyAM-QGoQ==/6665239487822533.jpg","or":"orpheus://nm/artist/home?id=228547&type=artist"}]}
-{"t":5403,"c":[{"tx":"编曲: "},{"tx":"Alex San","li":"http://p1.music.126.net/pSbvYkrzZ1RFKqoh-fA9AQ==/109951166352922615.jpg","or":"orpheus://nm/artist/home?id=28984845&type=artist"}]}
-{"t":10806,"c":[{"tx":"制作人: "},{"tx":"王菲","li":"http://p1.music.126.net/1KQVD6XWbs5IAV0xOj1ZIA==/18764265441342019.jpg","or":"orpheus://nm/artist/home?id=9621&type=artist"},{"tx":"/"},{"tx":"梁荣骏","li":"http://p1.music.126.net/QrD8drwrRcegfKLPoiiG2Q==/109951166288436155.jpg","or":"orpheus://nm/artist/home?id=189294&type=artist"}]}
-```
-该字段不一定出现；可能出现的数据意义有：
-- `t` : 数据显示开始时间戳 (毫秒)
-- `c` : 元数据list
-- `tx`: 文字段
-- `li`: 艺术家、歌手头像图url
-- `or`：云音乐app内路径；例中作用即打开艺术家主页
-* 逐字歌词
-```
-[16210,3460](16210,670,0)还(16880,410,0)没...
- ~~~~1 ~~~2  ~~~~3 ~~4 5 ~6 (...) 
-```
-由标号解释:
-1. 歌词行显示开始时间戳 (毫秒)
-2. 歌词行显示总时长(毫秒)
-3. 逐字显示开始时间戳 (毫秒)
-4. 逐字显示时长 (厘秒/0.01s)
-5. 未知
-6. 文字
-
-`yrc`的`version`字段貌似与`lyric`字段格式无关
-
 ### 新歌速递
 
 说明 : 调用此接口 , 可获取新歌速递
@@ -1780,13 +1683,9 @@ tags: 歌单标签
 
 3: 专辑
 
-4: 电台节目
+4: 电台
 
 5: 视频
-
-6: 动态
-
-7: 电台
 ```
 
 **可选参数 :** `limit`: 取出评论数量 , 默认为 20
@@ -1901,13 +1800,9 @@ tags: 歌单标签
 
 3: 专辑
 
-4: 电台节目
+4: 电台
 
 5: 视频
-
-6: 动态
-
-7: 电台
 ```
 
 **可选参数 :** `limit`: 取出评论数量 , 默认为 20
@@ -1938,13 +1833,11 @@ tags: 歌单标签
 
 3: 专辑
 
-4: 电台节目
+4: 电台
 
 5: 视频
 
 6: 动态
-
-7: 电台
 ```
 
 **可选参数 :**  
@@ -1982,13 +1875,11 @@ tags: 歌单标签
 
 3: 专辑
 
-4: 电台节目
+4: 电台
 
 5: 视频
 
 6: 动态
-
-7: 电台
 ```
 
 **接口地址 :** `/comment/like`
@@ -2088,24 +1979,23 @@ tags: 歌单标签
    `type`: 数字,资源类型,对应歌曲,mv,专辑,歌单,电台,视频对应以下类型  
    
 
-    ```
-    0: 歌曲
+   ```
+   0: 歌曲
 
-    1: mv
+   1: mv
 
-    2: 歌单
+   2: 歌单
 
-    3: 专辑
+   3: 专辑
 
-    4: 电台节目
+   4: 电台
 
-    5: 视频
 
-    6: 动态
+   5: 视频
 
-    7: 电台
+   6: 动态
 
-    ```  
+   ```  
    
    `id`:对应资源 id
    `content` :内容 id,可通过 `/comment/mv` 等接口获取
@@ -2146,21 +2036,13 @@ tags: 歌单标签
 
 
 ```
-0: 歌曲
-
 1: mv
 
-2: 歌单
-
-3: 专辑
-
-4: 电台节目
+4: 电台
 
 5: 视频
 
 6: 动态
-
-7: 电台
 ```
 
 
@@ -2229,13 +2111,11 @@ fee: enum,
   4: 购买专辑
   8: 非会员可免费播放低音质，会员可播放高音质及下载
   fee 为 1 或 8 的歌曲均可单独购买 2 元单曲
-v: u64, 常为[1, ?]任意数字, 代表歌曲当前信息版本
-version: u64, 常为[1, ?]任意数字, 代表歌曲当前信息版本
+v: u64, 常为[1, ?]任意数字, 功能未知
 crbt: Option<String>, None或字符串表示的十六进制，功能未知
 cf: Option<String>, 空白字串或者None，功能未知
 al: Album, 专辑，如果是DJ节目(dj_type != 0)或者无专辑信息(single == 1)，则专辑id为0
 dt: u64, 歌曲时长
-sq: Option<Quality>, 无损质量文件信息
 h: Option<Quality>, 高质量文件信息
 m: Option<Quality>, 中质量文件信息
 l: Option<Quality>, 低质量文件信息
@@ -2244,7 +2124,7 @@ cd: Option<String>, None或如"04", "1/2", "3", "null"的字符串，表示歌�
 no: u32, 表示歌曲属于CD中第几曲，0表示没有这个字段，对应音频文件的Tag
 rtUrl: Option<String(?)>, 常为None, 功能未知
 rtUrls: Vec<String(?)>, 常为空列表, 功能未知
-djId: u64,
+dj_id: u64,
   0: 不是DJ节目
   其他：是DJ节目，表示DJ ID
 copyright: u32, 0, 1, 2: 功能未知
@@ -2264,7 +2144,7 @@ rtype: 常为0，功能未知
 rurl: Option<String(?)>, 常为None，功能未知
 mst: u32, 偶尔为0, 常为9，功能未知
 cp: u64, 功能未知
-publishTime: i64, 毫秒为单位的Unix时间戳
+publish_time: i64, 毫秒为单位的Unix时间戳
 pc: 云盘歌曲信息，如果不存在该字段，则为非云盘歌曲
 ```
 
@@ -2708,13 +2588,7 @@ pc: 云盘歌曲信息，如果不存在该字段，则为非云盘歌曲
 
 **接口地址 :** `/program/recommend`
 
-**可选参数 :**  
-`limit`: 取出数量 , 默认为 10
-
-`offset`: 偏移数量 , 用于分页 , 如 :( 页数 -1)\*10, 其中 10 为 limit 的值 , 默认
-为 0
-
-**调用例子 :** `/program/recommend?limit=5`
+**调用例子 :** `/program/recommend`
 
 ### 独家放送(入口列表)
 
@@ -2933,7 +2807,7 @@ type : 地区
 
 **可选参数 :**
 
-`limit` : 返回数量 , 默认为 30
+`limit` : 返回数量 , 默认为 200
 
 `offset` : 偏移数量，用于分页 , 如 :( 页数 -1)\*200, 其中 200 为 limit 的值 , 默认为 0
 
@@ -3624,17 +3498,13 @@ type='1009' 获取其 id, 如`/search?keywords= 代码时间 &type=1009`
 
 **调用例子 :** `/artist/new/mv?limit=1` `/artist/new/mv?limit=1&before=1602777625000`
 
-### 一起听相关
+### 一起听状态
 
-一起听相关参见此 Issue: [#1676](https://github.com/Binaryify/NeteaseCloudMusicApi/issues/1676)
+说明 :登录后调用此接口可获取一起听状态
 
-主机模式:
+**接口地址 :** `/listen/together/status`
 
-代码可参考: https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/public/listen_together_host.html
-
-访问地址: http://localhost:3000/listen_together_host.html
-
-从机模式: 待整理
+**调用例子 :** `/listen/together/status`
 
 ### batch 批量请求接口
 
@@ -3706,7 +3576,7 @@ type='1009' 获取其 id, 如`/search?keywords= 代码时间 &type=1009`
 
 ### vip 成长值
 
-说明 : 登录后调用此接口 , 可获取当前会员成长值
+说明 : 登陆后调用此接口 , 可获取当前会员成长值
 
 **接口地址 :** `/vip/growthpoint`
 
@@ -3726,7 +3596,7 @@ type='1009' 获取其 id, 如`/search?keywords= 代码时间 &type=1009`
 
 ### vip 任务
 
-说明 : 登录后调用此接口 , 可获取会员任务
+说明 : 登陆后调用此接口 , 可获取会员任务
 
 **接口地址 :** `/vip/tasks`
 
@@ -3734,7 +3604,7 @@ type='1009' 获取其 id, 如`/search?keywords= 代码时间 &type=1009`
 
 ### 领取 vip 成长值
 
-说明 : 登录后调用此接口 , 可获取已完成的会员任务的成长值奖励
+说明 : 登陆后调用此接口 , 可获取已完成的会员任务的成长值奖励
 
 **必选参数 :** `ids` : 通过`/vip/tasks`获取到的`unGetIds`
 
@@ -3996,129 +3866,6 @@ type='1009' 获取其 id, 如`/search?keywords= 代码时间 &type=1009`
 
 **调用例子 :** `/vip/timemachine` `/vip/timemachine?startTime=1638288000000&endTime=1640966399999&limit=10`（2021年12月） `/vip/timemachine?startTime=1609430400&endTime=1640966399999&limit=60`(2021年)
 
-### 音乐百科 - 简要信息
-
-说明: 调用此接口可以获取歌曲的音乐百科简要信息
-
-由于此接口返回内容过于复杂, 请按需取用
-
-**接口地址:** `/song/wiki/summary`
-
-**必选参数:** `id`: 歌曲 ID
-
-**调用例子:** `/song/wiki/summary?id=1958384591`
-
-### 乐谱列表
-
-说明: 调用此接口可以获取歌曲的乐谱列表
-
-**接口地址:** `/sheet/list`
-
-**必选参数:** `id`: 歌曲 ID
-
-**调用例子:** `/sheet/list?id=1815684465`
-
-### 乐谱内容
-
-说明: 登录后调用此接口获取乐谱的内容
-
-**接口地址:** `/sheet/preview`
-
-**必选参数:** `id`: **乐谱** ID
-
-**调用例子:** `/sheet/preview?id=143190`
-
-### 曲风列表
-
-说明: 调用此接口获取曲风列表及其对应的 `tagId`
-
-**接口地址:** `/style/list`
-
-**调用例子:** `/style/list`
-
-### 曲风偏好
-
-说明: 登录后调用此接口获取我的曲风偏好
-
-**接口地址:** `/style/preference`
-
-**调用例子:** `/style/preference`
-
-### 曲风详情
-
-说明: 调用此接口可以获取该曲风的描述信息
-
-**接口地址:** `/style/detail`
-
-**必选参数:** `tagId`: 曲风 ID
-
-**调用例子:** `/style/detail?tagId=1000`
-
-### 曲风-歌曲
-
-说明: 调用此接口可以获取该曲风对应的歌曲
-
-**接口地址:** `/style/song`
-
-**必选参数:** `tagId`: 曲风 ID
-
-**可选参数 :** `size` : 返回数量 , 默认为 20
-
-`cursor` : 返回数据的 cursor, 默认为 0 , 传入上一次返回结果的 cursor,将会返回下一页的数据
-
-`sort`: 排序方式，0: 按热度排序，1: 按时间排序
-
-**调用例子:** `/style/song?tagId=1000` `/style/song?tagId=1010&sort=1`
-
-### 曲风-专辑
-
-说明: 调用此接口可以获取该曲风对应的专辑
-
-**接口地址:** `/style/album`
-
-**必选参数:** `tagId`: 曲风 ID
-
-**可选参数 :** `size` : 返回数量 , 默认为 20
-
-`cursor` : 返回数据的 cursor, 默认为 0 , 传入上一次返回结果的 cursor,将会返回下一页的数据
-
-`sort`: 排序方式，0: 按热度排序，1: 按时间排序
-
-**调用例子:** `/style/album?tagId=1000` `/style/album?tagId=1010&sort=1`
-
-### 曲风-歌单
-
-说明: 调用此接口可以获取该曲风对应的歌单
-
-**接口地址:** `/style/playlist`
-
-**必选参数:** `tagId`: 曲风 ID
-
-**可选参数 :** `size` : 返回数量 , 默认为 20
-
-`cursor` : 返回数据的 cursor, 默认为 0 , 传入上一次返回结果的 cursor,将会返回下一页的数据
-
-**调用例子:** `/style/playlist?tagId=1000`
-
-### 曲风-歌手
-
-说明: 调用此接口可以获取该曲风对应的歌手
-
-**接口地址:** `/style/artist`
-
-**必选参数:** `tagId`: 曲风 ID
-
-**可选参数 :** `size` : 返回数量 , 默认为 20
-
-`cursor` : 返回数据的 cursor, 默认为 0 , 传入上一次返回结果的 cursor,将会返回下一页的数据
-
-**调用例子:** `/style/artist?tagId=1000`
-
-### 云村星评馆 - 简要评论
-
-说明: 调用此接口可以获取首页推荐的星评馆评论信息
-
-**接口地址:** `/starpick/comments/summary`
 
 ## 离线访问此文档
 
