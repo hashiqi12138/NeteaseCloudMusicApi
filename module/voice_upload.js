@@ -115,6 +115,7 @@ module.exports = async (query, request) => {
 
   // preCheck
   await request(
+    'post',
     `/api/voice/workbench/voice/batch/upload/preCheck`,
     {
       dupkey: createDupkey(),
@@ -146,6 +147,7 @@ module.exports = async (query, request) => {
     },
   )
   const result = await request(
+    'post',
     `/api/voice/workbench/voice/batch/upload/v2`,
     {
       dupkey: createDupkey(),

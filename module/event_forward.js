@@ -7,5 +7,5 @@ module.exports = (query, request) => {
     id: query.evId,
     eventUserId: query.uid,
   }
-  return request(`/api/event/forward`, data, createOption(query))
+  return request(`/api/event/forward`, data, createOption(query, 'weapi'))
 }

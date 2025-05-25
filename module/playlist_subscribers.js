@@ -7,5 +7,9 @@ module.exports = (query, request) => {
     limit: query.limit || 20,
     offset: query.offset || 0,
   }
-  return request(`/api/playlist/subscribers`, data, createOption(query))
+  return request(
+    `/api/playlist/subscribers`,
+    data,
+    createOption(query, 'weapi'),
+  )
 }

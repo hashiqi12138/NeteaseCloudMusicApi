@@ -15,7 +15,7 @@ module.exports = async (query, request) => {
     const res = await request(
       `/api/playlist/manipulate/tracks`,
       data,
-      createOption(query),
+      createOption(query, 'weapi'),
     )
     return {
       status: 200,
@@ -33,7 +33,7 @@ module.exports = async (query, request) => {
           trackIds: JSON.stringify([...tracks, ...tracks]),
           imme: 'true',
         },
-        createOption(query),
+        createOption(query, 'weapi'),
       )
     } else {
       return {

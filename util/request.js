@@ -48,8 +48,8 @@ const osMap = {
   },
   iphone: {
     os: 'iPhone OS',
-    appver: '9.0.90',
-    osver: '16.2',
+    appver: '9.1.70',
+    osver: '18.0.1',
     channel: 'distribution',
   },
 }
@@ -67,7 +67,7 @@ const chooseUserAgent = (crypto, uaType = 'pc') => {
       pc: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36 Chrome/91.0.4472.164 NeteaseMusicDesktop/3.0.18.203152',
       android:
         'NeteaseMusic/9.1.65.240927161425(9001065);Dalvik/2.1.0 (Linux; U; Android 14; 23013RK75C Build/UKQ1.230804.001)',
-      iphone: 'NeteaseMusic 9.0.90/5038 (iPhone; iOS 16.2; zh_CN)',
+      iphone: 'NeteaseMusic 9.1.70/5410 (iPhone; iOS 18.0.1; zh_CN)',
     },
   }
   return userAgentMap[crypto][uaType] || ''
@@ -89,7 +89,7 @@ const createRequest = (uri, data, options) => {
     }
     if (typeof cookie === 'object') {
       let _ntes_nuid = CryptoJS.lib.WordArray.random(32).toString()
-      let os = osMap[cookie.os] || osMap['iphone']
+      let os = osMap[cookie.os] || osMap['pc']
       cookie = {
         ...cookie,
         __remember_me: 'true',
@@ -183,13 +183,13 @@ const createRequest = (uri, data, options) => {
         if (crypto === 'eapi') {
           // 使用eapi加密
           data.header = header
-          data.e_r = toBoolean(
-            options.e_r !== undefined
+          data.e_r =
+            options.e_r != undefined
               ? options.e_r
-              : data.e_r !== undefined
+              : data.e_r != undefined
               ? data.e_r
-              : APP_CONF.encryptResponse,
-          ) // 用于加密接口返回值
+              : APP_CONF.encryptResponse // 用于加密接口返回值
+          data.e_r = toBoolean(data.e_r)
           encryptData = encrypt.eapi(uri, data)
           url = APP_CONF.apiDomain + '/eapi/' + uri.substr(5)
         } else if (crypto === 'api') {
@@ -259,7 +259,7 @@ const createRequest = (uri, data, options) => {
           x.replace(/\s*Domain=[^(;|$)]+;*/, ''),
         )
         try {
-          if (crypto === 'eapi' && data.e_r) {
+          if (data.e_r) {
             // eapi接口返回值被加密，需要解密
             answer.body = encrypt.eapiResDecrypt(
               body.toString('hex').toUpperCase(),
@@ -301,4 +301,4 @@ const createRequest = (uri, data, options) => {
   })
 }
 
-module.exports = createRequest
+module.exports = createRequest, osMap

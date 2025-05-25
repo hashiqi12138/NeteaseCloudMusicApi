@@ -8,5 +8,5 @@ module.exports = (query, request) => {
     msg: query.msg,
     userIds: '[' + query.user_ids + ']',
   }
-  return request(`/api/msg/private/send`, data, createOption(query))
+  return request(`/api/msg/private/send`, data, createOption(query, 'weapi'))
 }
