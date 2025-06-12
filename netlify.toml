@@ -1,0 +1,75 @@
+[build]
+  base = "/"
+  command = ""
+  publish = "/"
+  [build.environment]
+    NODE_VERSION = "18"
+
+[functions]
+  external_node_modules = ["express", "axios", "xml2js", "crypto-js", "express-fileupload", "md5", "music-metadata", "node-forge", "pac-proxy-agent", "qrcode", "safe-decode-uri-component", "tunnel", "yargs"]
+  node_bundler = "esbuild"
+  included_files = ["./data/**", "./module/**", "./plugins/**", "./util/**", "app.js", "index.js", "generateTemplate.js", "main.js", "server.js", "package.json", "./netlify.toml"]
+
+[[redirects]]
+  from = "/api/song/proxy/*"
+  query = { domain = ":domain" }
+  status = 200
+  to = "http://:domain/:splat"
+  force = true
+  headers = { test = "123" }
+
+[[headers]]
+  for = "/api/song/proxy/*"
+  force = true
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    test = "112"
+
+[[redirects]]
+  force = true
+  from = "/api/*"
+  status = 200
+  to = "/.netlify/functions/api/:splat"
+
+[[redirects]]
+  force = true
+  from = "/daily_signin"
+  status = 200
+  to = "/.netlify/functions/api/daily_signin"
+
+[[redirects]]
+  force = true
+  from = "/personal_fm"
+  status = 200
+  to = "/.netlify/functions/api/personal_fm"
+  
+[[redirects]]
+  force = true
+  from = "/fm_trash"
+  status = 200
+  to = "/.netlify/functions/api/fm_trash"
+
+
+
+[[redirects]]
+  from = "/docs/*"
+  status = 200
+  to = "/public/docs/:splat"
+
+[[redirects]]
+  force = true
+  from = "/docs"
+  status = 200
+  to = "/docs/"
+
+
+
+[[redirects]]
+  from = "/docs/"
+  status = 200
+  to = "/public/docs/index.html"
+
+[[redirects]]
+  from = "/*"
+  status = 200
+  to = "/public/"

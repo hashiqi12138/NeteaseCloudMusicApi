@@ -10,11 +10,11 @@ if (!fs.existsSync(path.resolve(tmpPath, 'anonymous_token'))) {
 let firstRun = true
 /** @type {Record<string, any>} */
 let obj = {}
-fs.readdirSync(path.join(__dirname, 'module'))
+fs.readdirSync(path.join(__dirname, '../module'))
   .reverse()
   .forEach((file) => {
     if (!file.endsWith('.js')) return
-    let fileModule = require(path.join(__dirname, 'module', file))
+    let fileModule = require(path.join(__dirname, '../module', file))
     let fn = file.split('.').shift() || ''
     obj[fn] = function (data = {}) {
       if (typeof data.cookie === 'string') {

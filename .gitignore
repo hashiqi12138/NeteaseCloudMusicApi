@@ -8,3 +8,6 @@ examples/moddef.json
 bin
 anonymous_token
 .vercel
+
+# Local Netlify folder
+.netlify

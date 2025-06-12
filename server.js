@@ -8,6 +8,69 @@ const cache = require('./util/apicache').middleware
 const { cookieToJson } = require('./util/index')
 const fileUpload = require('express-fileupload')
 const decode = require('safe-decode-uri-component')
+const axios = require('axios')
+
+const url = require('url')
+const https = require('https')
+const http = require('http')
+
+async function downloadMP3(link, outputPath) {
+  // 解析 URL 确定协议
+  const parsedUrl = url.parse(link)
+  const isHttps = parsedUrl.protocol === 'https:'
+  const transport = isHttps ? https : http
+
+  // 重定向计数器（防止无限重定向）
+  let redirectCount = 0
+  let currentUrl = link
+
+  while (redirectCount < 5) {
+    const result = await new Promise((resolve, reject) => {
+      const request = transport.get(currentUrl, (response) => {
+        // 处理重定向 (3xx 状态码)
+        if ([301, 302, 307, 308].includes(response.statusCode)) {
+          redirectCount++
+          if (response.headers.location) {
+            currentUrl = response.headers.location
+            return resolve({ redirect: true })
+          }
+          return reject(new Error('重定向位置未指定'))
+        }
+
+        // 检查响应状态
+        if (response.statusCode !== 200) {
+          return reject(new Error(`请求失败，状态码: ${response.statusCode}`))
+        }
+
+        // 收集二进制数据
+        const chunks = []
+        response.on('data', (chunk) => chunks.push(chunk))
+        response.on('end', () =>
+          resolve({
+            data: Buffer.concat(chunks),
+            contentType: response.headers['content-type'],
+          }),
+        )
+      })
+
+      request.on('error', reject)
+    })
+
+    // 如果是重定向则继续
+    if (result.redirect) continue
+
+    // 验证内容类型
+    if (!result.contentType || !result.contentType.includes('audio/mpeg')) {
+      console.warn('⚠️ 内容类型不是 audio/mpeg:', result.contentType)
+    }
+
+    // 保存文件
+    // await fs.promises.writeFile(outputPath, result.data);
+    return result.data
+  }
+
+  throw new Error('重定向次数超过限制')
+}
 
 /**
  * The version check result.
@@ -78,11 +141,15 @@ async function getModulesDefinitions(
     .filter((file) => file.endsWith('.js'))
     .map((file) => {
       const identifier = file.split('.').shift()
-      const route = parseRoute(file)
+      const route = '/api' + parseRoute(file)
       const modulePath = path.join(modulesPath, file)
       const module = doRequire ? require(modulePath) : modulePath
 
-      return { identifier, route, module }
+      return {
+        identifier,
+        route,
+        module,
+      }
     })
 
   return modules
@@ -176,15 +243,93 @@ async function consturctServer(moduleDefs) {
   /**
    * Body Parser and File Upload
    */
-  app.use(express.json({ limit: '50mb' }))
-  app.use(express.urlencoded({ extended: false, limit: '50mb' }))
+  app.use(
+    express.json({
+      limit: '50mb',
+    }),
+  )
+  app.use(
+    express.urlencoded({
+      extended: false,
+      limit: '50mb',
+    }),
+  )
 
   app.use(fileUpload())
 
   /**
    * Cache
    */
-  app.use(cache('2 minutes', (_, res) => res.statusCode === 200))
+  // app.use(cache('2 minutes', (_, res) => res.statusCode === 200))
+
+  /**
+   * 文件跨域
+   */
+  app.use('/api/song/asset/v1', async (req, res) => {
+    const targetUrl = req.query.url
+    if (!targetUrl) {
+      return res.status(400).json({ error: 'Missing URL parameter' })
+    }
+
+    console.log(targetUrl)
+
+    const parsedUrl = new URL(targetUrl)
+    const transport = parsedUrl.protocol === 'https:' ? https : http
+
+    const options = {
+      hostname: parsedUrl.hostname,
+      port: parsedUrl.port || (parsedUrl.protocol === 'https:' ? 443 : 80),
+      path: parsedUrl.pathname + parsedUrl.search,
+      method: 'GET',
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        Accept: '*/*',
+        Connection: 'keep-alive',
+        Range: 'bytes-0',
+      },
+    }
+
+    try {
+      const proxyReq = transport.request(options, (proxyRes) => {
+        // 验证内容类型
+        const contentType = proxyRes.headers['content-type'] || ''
+
+        if (!contentType.includes('audio/mpeg')) {
+          console.warn(`Unexpected content type: ${contentType}`)
+        }
+
+        // 设置响应头 - 关键：保持原始二进制数据
+        res.set({
+          'Content-Type': contentType || 'audio/mpeg',
+          'Content-Length': proxyRes.headers['content-length'],
+          'Accept-Ranges': 'bytes',
+        })
+
+        // 直接管道传输 - 避免任何中间处理
+        proxyRes.pipe(res)
+      })
+
+      proxyReq.end()
+
+      // const buffer = await downloadMP3(targetUrl, `./downloaded_audio_${Date.now()}.mp3`)
+
+      // // console.log(buffer)
+      // // console.log(buffer.length)
+      // res.set(
+      //   {
+      //     'Content-Length': buffer.length,
+      //     'Content-Disposition': 'inline; filename="audio.mp3"',
+      //     'Content-Type': 'audio/mpeg;charset=UTF-8',
+      //   }
+      // )
+      // console.log(res)
+      // console.log('on write server')
+      // res.send(buffer)
+    } catch (error) {
+      console.error(error)
+    }
+  })
 
   /**
    * Special Routers
@@ -198,9 +343,10 @@ async function consturctServer(moduleDefs) {
   /**
    * Load every modules in this directory
    */
+  console.log(path.join(__dirname, './module'))
   const moduleDefinitions =
     moduleDefs ||
-    (await getModulesDefinitions(path.join(__dirname, 'module'), special))
+    (await getModulesDefinitions(path.join(__dirname, '../module'), special))
 
   for (const moduleDef of moduleDefinitions) {
     // Register the route.
@@ -213,7 +359,9 @@ async function consturctServer(moduleDefs) {
 
       let query = Object.assign(
         {},
-        { cookie: req.cookies },
+        {
+          cookie: req.cookies,
+        },
         req.query,
         req.body,
         req.files,
@@ -223,7 +371,7 @@ async function consturctServer(moduleDefs) {
         const moduleResponse = await moduleDef.module(query, (...params) => {
           // 参数注入客户端IP
           const obj = [...params]
-          let ip = req.ip
+          let ip = req.ip || ''
 
           if (ip.substr(0, 7) == '::ffff:') {
             ip = ip.substr(7)
@@ -248,7 +396,7 @@ async function consturctServer(moduleDefs) {
               res.append(
                 'Set-Cookie',
                 cookies.map((cookie) => {
-                  return cookie + '; SameSite=None; Secure'
+                  return cookie + 'SameSite=None; Secure;'
                 }),
               )
             } else {
@@ -311,9 +459,9 @@ async function serveNcmApi(options) {
 
   /** @type {import('express').Express & ExpressExtension} */
   const appExt = app
-  appExt.server = app.listen(port, host, () => {
-    console.log(`server running @ http://${host ? host : 'localhost'}:${port}`)
-  })
+  // appExt.server = app.listen(port, host, () => {
+  //   console.log(`server running @ http://${host ? host : 'localhost'}:${port}`)
+  // })
 
   return appExt
 }
